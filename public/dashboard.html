@@ -182,18 +182,17 @@
 
     .logomark { filter: drop-shadow(0 3px 9px rgba(249, 115, 22, .35)); }
 
-    /* aviso de IA não configurada — aparece no load, antes de qualquer anexo */
-    #env-warn { position: fixed; top: 72px; left: 50%; transform: translateX(-50%); z-index: 80;
-      display: flex; align-items: flex-start; gap: 11px; max-width: min(720px, 92vw);
-      background: color-mix(in srgb, #f59e0b 14%, var(--panel)); border: 1px solid color-mix(in srgb, #f59e0b 45%, transparent);
-      color: var(--text); border-radius: 14px; padding: 12px 14px 12px 16px; font: 13px/1.5 var(--font-ui);
-      box-shadow: 0 14px 40px rgba(0,0,0,.3); animation: chip-in .3s cubic-bezier(.34,1.56,.64,1); }
-    #env-warn svg { flex: 0 0 auto; color: #f59e0b; margin-top: 2px; }
-    #env-warn code { background: var(--sunken, rgba(0,0,0,.2)); border: 1px solid var(--panel-border);
-      border-radius: 5px; padding: 1px 6px; font: 11.5px var(--font-mono, monospace); }
-    #env-warn button { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 17px;
-      line-height: 1; padding: 0 2px; border-radius: 6px; flex: 0 0 auto; }
-    #env-warn button:hover { color: var(--text); }
+    /* passo a passo do .env no hero — aparece no lugar do "1 · Anexe" quando a IA não está configurada */
+    .hero-steps.env { flex-direction: column; align-items: flex-start; gap: 13px; margin: 26px auto 0;
+      max-width: 620px; text-align: left; background: var(--panel);
+      border: 1px solid color-mix(in srgb, #f59e0b 40%, var(--panel-border));
+      border-radius: 16px; padding: 18px 22px; box-shadow: var(--tile-shadow); }
+    .hero-steps.env .hs { align-items: flex-start; font-size: 13px; line-height: 1.55; }
+    .hero-steps.env .hs-ic { font: 700 12.5px var(--font-ui); color: var(--accent);
+      border-color: color-mix(in srgb, var(--accent) 40%, var(--panel-border)); }
+    .hero-steps.env code { background: var(--sunken, rgba(0,0,0,.2)); border: 1px solid var(--panel-border);
+      border-radius: 5px; padding: 1px 6px; font: 11.5px var(--font-mono, monospace); color: var(--text-2); }
+    .hero-steps.env a { color: var(--accent-2); text-decoration: underline; text-underline-offset: 3px; }
 
     /* chip da licença MIT (ao lado do "análise inteligente") + modal de leitura */
     .mit-chip { font: 600 10px var(--font-mono, monospace); letter-spacing: .12em; text-transform: uppercase;
@@ -531,7 +530,7 @@
       <div id="db-name"></div>
     </div>
     <div class="tb-side tb-right">
-      <button id="btn-user" class="us-avatar-btn" title="Seu espaço: perfil e relatórios salvos">?</button>
+      <button id="btn-user" class="us-avatar-btn" title="Seu espaço: perfil e relatórios salvos">T</button>
       <button id="tour-help" class="icon-btn" title="Rever tutorial">
         <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/><circle cx="12" cy="17.5" r=".6" fill="currentColor"/></svg>
       </button>

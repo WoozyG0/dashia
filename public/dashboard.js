@@ -485,7 +485,7 @@ function openSqlModal(t) {
 let userProfile = null;
 async function loadUserProfile() {
   try { const r = await fetch("/user").then((x) => x.json()); userProfile = (r.ok && r.user) || {}; } catch { userProfile = {}; }
-  const av = $("btn-user"); if (av) av.textContent = (userProfile.name || "?").trim().charAt(0).toUpperCase() || "?";
+  const av = $("btn-user"); if (av) av.textContent = (userProfile.name || "Teste").trim().charAt(0).toUpperCase() || "T";
 }
 async function openUserSpace() {
   const r = await fetch("/dashboard/list").then((x) => x.json()).catch(() => ({}));
@@ -506,7 +506,7 @@ async function openUserSpace() {
     </div>`).join("");
   openModal(`<div class="user-space">
     <div class="us-head">
-      <span class="us-avatar">${esc((u.name || "?").trim().charAt(0).toUpperCase() || "?")}</span>
+      <span class="us-avatar">${esc((u.name || "Teste").trim().charAt(0).toUpperCase() || "T")}</span>
       <div><h3 style="margin:0">Seu espaço</h3><div class="db-meta">Perfil e relatórios salvos — tudo local, na sua máquina.</div></div>
     </div>
     <div class="us-profile">
@@ -635,6 +635,7 @@ function newDash() {
   $("ex-chips").innerHTML = "";
   thinkClear();
   $("prompt").value = ""; $("prompt").focus();
+  applyEnvGuide(); // se a IA não está configurada, o hero volta a mostrar o passo a passo do .env
 }
 function submitPrompt(nl) {
   nl = (nl ?? $("prompt").value).trim();
@@ -649,16 +650,24 @@ $("t-save").onclick = () => dash && openSaveModal();
 $("t-open").onclick = openUserSpace;
 $("btn-user") && ($("btn-user").onclick = openUserSpace);
 loadUserProfile();
-// aviso ANTES de anexar: IA não configurada (sem ANTHROPIC_API_KEY e sem Claude Code logado)
+// IA não configurada (sem ANTHROPIC_API_KEY e sem Claude Code logado): o hero troca o
+// "1 · Anexe…" pelo PASSO A PASSO de configuração — o testador é guiado ANTES de anexar.
+let _aiNone = false;
+function applyEnvGuide() {
+  if (!_aiNone) return;
+  const steps = document.querySelector(".hero-steps"); if (!steps) return;
+  const desc = $("db-empty").querySelector("div:nth-child(3)");
+  if (desc) desc.innerHTML = "Falta um passo: <b>configure a IA</b> para a análise funcionar — leva 1 minuto.";
+  steps.classList.add("env");
+  steps.innerHTML = `
+    <div class="hs"><span class="hs-ic">1</span><span><b>Crie sua chave</b> no console da Anthropic:
+      <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com/settings/keys</a></span></div>
+    <div class="hs"><span class="hs-ic">2</span><span>Na pasta do projeto, copie <code>.env.example</code> para <code>.env</code> e cole a chave: <code>ANTHROPIC_API_KEY=sk-ant-…</code></span></div>
+    <div class="hs"><span class="hs-ic">3</span><span><b>Reinicie o servidor</b> (<code>npm start</code>) e recarregue esta página</span></div>
+    <div class="hs"><span class="hs-ic">✦</span><span>Alternativa sem chave: instale o <b>Claude Code</b> e faça login (<code>claude</code> no terminal)</span></div>`;
+}
 fetch("/health").then((r) => r.json()).then((h) => {
-  if (!h || h.ai !== "none") return;
-  const b = document.createElement("div");
-  b.id = "env-warn";
-  b.innerHTML = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-    <span><b>IA não configurada.</b> Copie <code>.env.example</code> para <code>.env</code>, preencha sua <code>ANTHROPIC_API_KEY</code> e reinicie o servidor — ou instale e faça login no <b>Claude Code</b>. Sem isso, a análise não roda.</span>
-    <button id="env-warn-x" title="Dispensar">×</button>`;
-  document.body.appendChild(b);
-  $("env-warn-x").onclick = () => b.remove();
+  if (h && h.ai === "none") { _aiNone = true; applyEnvGuide(); }
 }).catch(() => {});
 // licença MIT no topbar — abre o texto completo num modal
 $("btn-mit") && ($("btn-mit").onclick = async () => {

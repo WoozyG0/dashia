@@ -777,8 +777,11 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape" && document
 // init
 applyTheme(localStorage.getItem("studio-theme") || "dark");
 $("ex-chips").innerHTML = "";
-// ── logo: volta ao topo (recarrega) ──
-document.querySelector("#topbar .logo")?.addEventListener("click", () => (location.href = "/"));
+// ── logo: volta à landing (mas o botão da licença, que vive dentro do logo, abre o modal) ──
+document.querySelector("#topbar .logo")?.addEventListener("click", (e) => {
+  if (e.target.closest("#btn-mit")) return;
+  location.href = "/";
+});
 
 // ── tutorial gamificado (spotlight + fala) ──
 const TOUR = [

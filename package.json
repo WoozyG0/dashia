@@ -1,0 +1,19 @@
+{
+  "name": "dashia",
+  "version": "0.1.0",
+  "description": "Dash.IA — dashboards inteligentes a partir de documentos",
+  "type": "module",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "latest",
+    "pdfjs-dist": "^3.11.174",
+    "pptxgenjs": "^3.12.0"
+  },
+  "engines": {
+    "node": ">=20.6"
+  }
+}

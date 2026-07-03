@@ -625,6 +625,7 @@ function newDash() {
   showDocBanner();
   $("prompt").placeholder = "Descreva a análise… ou anexe uma planilha (clipe) e clique enviar";
   $("title").textContent = "";
+  $("db-name").textContent = ""; // limpa o nome do dash anterior no topbar
   $("db-result").classList.add("hidden");
   $("db-empty").classList.remove("hidden");
   $("db-empty").querySelector(".eh-title").innerHTML = "Seus dados têm uma história.<br/>A IA conta ela para você.";
@@ -646,6 +647,14 @@ $("t-save").onclick = () => dash && openSaveModal();
 $("t-open").onclick = openUserSpace;
 $("btn-user") && ($("btn-user").onclick = openUserSpace);
 loadUserProfile();
+// licença MIT no topbar — abre o texto completo num modal
+$("btn-mit") && ($("btn-mit").onclick = async () => {
+  const txt = await fetch("/license").then((r) => r.text()).catch(() => "MIT License — veja o arquivo LICENSE no repositório.");
+  openModal(`<h3>Licença MIT</h3><div class="db-meta">Software livre: use, copie, modifique e distribua — mantendo o aviso de copyright.</div>
+    <pre class="mit-pre">${esc(txt)}</pre>
+    <div class="modal-row"><button class="pill ghost" id="m-cancel">Fechar</button></div>`);
+  $("m-cancel").onclick = closeModal;
+});
 $("t-add") && ($("t-add").onclick = () => dash && docData && openAddModal());
 $("t-rebuild").onclick = () => lastNl && docData && buildFromDoc(lastNl);
 $("t-new").onclick = newDash;

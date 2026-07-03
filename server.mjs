@@ -81,6 +81,7 @@ http.createServer(async (req, res) => {
     if (pathname === "/") return serveFile(res, path.join(here, "public", "index.html")); // landing page
     if (pathname === "/app" || pathname === "/dashboard") return serveFile(res, path.join(here, "public", "dashboard.html"));
     if (pathname === "/favicon.ico") { res.writeHead(204); res.end(); return; }
+    if (pathname === "/license") return serveFile(res, path.join(here, "LICENSE"));
     if (/^\/(style\.css|dashboard\.js|chart-lib\.js|parse-worker\.js)$/.test(pathname)) return serveFile(res, path.join(here, "public", pathname.slice(1)));
     if (pathname.startsWith("/vendor/")) {
       const rel = pathname.slice(8);

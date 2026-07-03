@@ -182,6 +182,15 @@
 
     .logomark { filter: drop-shadow(0 3px 9px rgba(249, 115, 22, .35)); }
 
+    /* chip da licença MIT (ao lado do "análise inteligente") + modal de leitura */
+    .mit-chip { font: 600 10px var(--font-mono, monospace); letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted); background: none; border: 1px solid var(--panel-border); border-radius: 99px;
+      padding: 4px 11px; cursor: pointer; transition: color .15s, border-color .15s; flex: 0 0 auto; }
+    .mit-chip:hover { color: var(--accent-2); border-color: var(--accent-border); }
+    .mit-pre { max-height: 56vh; overflow: auto; background: var(--sunken, var(--bg)); border: 1px solid var(--panel-border);
+      border-radius: 12px; padding: 16px 18px; font: 12px/1.65 var(--font-mono, monospace); color: var(--text-2);
+      white-space: pre-wrap; margin-top: 12px; }
+
     /* ── loading da criação: um gráfico de barras 3D sobe, barra a barra, a cada etapa ── */
     #build-overlay:not(.journey) .bo-journey { display: none; }
     #build-overlay.journey .bo-skeleton, #build-overlay.journey .bo-card { display: none; }
@@ -503,9 +512,10 @@
         </svg>
         <span class="wordmark">Dash.IA</span>
         <span class="studio-chip">análise inteligente</span>
+        <button id="btn-mit" class="mit-chip" title="Ler a licença MIT">MIT License</button>
       </div>
       <span class="crumb-sep"></span>
-      <div id="db-name">—</div>
+      <div id="db-name"></div>
     </div>
     <div class="tb-side tb-right">
       <button id="btn-user" class="us-avatar-btn" title="Seu espaço: perfil e relatórios salvos">?</button>

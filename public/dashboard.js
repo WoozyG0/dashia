@@ -1099,7 +1099,8 @@ async function parsePdfFile(f) {
     s.onload = res; s.onerror = () => rej(new Error("leitor de PDF não disponível")); document.head.appendChild(s);
   });
   pdfjsLib.GlobalWorkerOptions.workerSrc = "/vendor/pdf.worker.min.js";
-  const doc = await pdfjsLib.getDocument({ data: await f.arrayBuffer() }).promise;
+  // isEvalSupported:false — mitigação do CVE-2024-4367 (execução de JS via fonte maliciosa no PDF)
+  const doc = await pdfjsLib.getDocument({ data: await f.arrayBuffer(), isEvalSupported: false }).promise;
   const nPages = Math.min(doc.numPages, 300);
   const pages = [];
   for (let i = 1; i <= nPages; i++) {

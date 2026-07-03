@@ -84,3 +84,7 @@ Anexe um CSV/XLSX/PDF, descreva a análise (ou envie em branco para a visão ger
 
 Node HTTP puro (zero framework) · [Claude Agent SDK](https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk) ·
 ECharts · SheetJS · pdf.js · pptxgenjs — vendorizados, funciona offline (exceto a IA).
+
+## Licença
+
+[MIT](LICENSE)

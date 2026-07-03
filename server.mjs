@@ -1,6 +1,8 @@
 // Dash.IA — servidor standalone (dashboards a partir de documentos, IA keyless via Agent SDK)
 import http from "node:http";
 import fs   from "node:fs/promises";
+import { existsSync, readFileSync } from "node:fs";
+import { homedir } from "node:os";
 import path from "node:path";
 import { URL } from "node:url";
 import { fileURLToPath } from "node:url";
@@ -82,6 +84,18 @@ http.createServer(async (req, res) => {
     if (pathname === "/app" || pathname === "/dashboard") return serveFile(res, path.join(here, "public", "dashboard.html"));
     if (pathname === "/favicon.ico") { res.writeHead(204); res.end(); return; }
     if (pathname === "/license") return serveFile(res, path.join(here, "LICENSE"));
+    // Como a IA está configurada? "key" (.env) | "claude-code" (sessão local) | "none" (a UI avisa)
+    if (pathname === "/health") {
+      let ai = process.env.ANTHROPIC_API_KEY ? "key" : "none";
+      if (ai === "none") {
+        try {
+          if (existsSync(path.join(homedir(), ".claude", ".credentials.json"))) ai = "claude-code";
+          else if (existsSync(path.join(homedir(), ".claude.json")) &&
+                   /oauthAccount|primaryApiKey/.test(readFileSync(path.join(homedir(), ".claude.json"), "utf8"))) ai = "claude-code";
+        } catch {}
+      }
+      return json(res, { ok: true, ai });
+    }
     if (/^\/(style\.css|dashboard\.js|chart-lib\.js|parse-worker\.js)$/.test(pathname)) return serveFile(res, path.join(here, "public", pathname.slice(1)));
     if (pathname.startsWith("/vendor/")) {
       const rel = pathname.slice(8);

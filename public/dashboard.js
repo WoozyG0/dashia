@@ -70,6 +70,8 @@ function hideOverlay() {
   const board = $("dashboardboard"); if (board) board.scrollTop = 0; // reveal sempre começa do topo
 }
 const fmtBytes = (b) => b >= 1048576 ? (b / 1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round(b / 1024)) + " KB";
+// nome de arquivo longo → trunca no MEIO (preserva o fim, onde vive a extensão)
+const shortName = (s, max = 44) => { s = String(s || ""); return s.length <= max ? s : s.slice(0, Math.ceil(max * 0.58)) + "…" + s.slice(-Math.floor(max * 0.38)); };
 
 // progresso ao vivo (SSE): passo atual + checklist dos painéis sendo rodados
 function setLoading(msg, p) {
@@ -252,7 +254,7 @@ async function restoreWorking() {
   if (spec.doc && spec.doc.columns) { // restaura o documento (pra recalcular e re-perguntar)
     docData = spec.doc; showDocBanner({ chip: false }); // chip some — dados já nos tiles
     setDocCtx(spec.doc.context || "", { store: false });
-    if (docData.rows) $("prompt").placeholder = `Pergunte sobre "${docData.name}"… ou envie em branco p/ um dashboard geral`;
+    if (docData.rows) $("prompt").placeholder = `Pergunte sobre "${shortName(docData.name, 34)}"… ou envie em branco p/ um dashboard geral`;
   }
   dash = { title: spec.title || "Meu dashboard", tiles: spec.tiles, schemaTables: spec.schemaTables || [], source: spec.source, reasoning: spec.reasoning, understanding: spec.understanding, plan: spec.plan };
   _staggerNext = true;
@@ -539,7 +541,7 @@ async function loadDash(name) {
   // restaura documento se o dash foi criado a partir de arquivo
   if (spec.doc && spec.doc.columns) {
     docData = spec.doc; showDocBanner({ chip: false }); // silencioso — dados já nos tiles
-    if (docData.rows) $("prompt").placeholder = `Pergunte sobre "${docData.name}"… ou envie em branco p/ um dashboard geral`;
+    if (docData.rows) $("prompt").placeholder = `Pergunte sobre "${shortName(docData.name, 34)}"… ou envie em branco p/ um dashboard geral`;
   } else {
     docData = null; showDocBanner();
   }
@@ -647,6 +649,17 @@ $("t-save").onclick = () => dash && openSaveModal();
 $("t-open").onclick = openUserSpace;
 $("btn-user") && ($("btn-user").onclick = openUserSpace);
 loadUserProfile();
+// aviso ANTES de anexar: IA não configurada (sem ANTHROPIC_API_KEY e sem Claude Code logado)
+fetch("/health").then((r) => r.json()).then((h) => {
+  if (!h || h.ai !== "none") return;
+  const b = document.createElement("div");
+  b.id = "env-warn";
+  b.innerHTML = `<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+    <span><b>IA não configurada.</b> Copie <code>.env.example</code> para <code>.env</code>, preencha sua <code>ANTHROPIC_API_KEY</code> e reinicie o servidor — ou instale e faça login no <b>Claude Code</b>. Sem isso, a análise não roda.</span>
+    <button id="env-warn-x" title="Dispensar">×</button>`;
+  document.body.appendChild(b);
+  $("env-warn-x").onclick = () => b.remove();
+}).catch(() => {});
 // licença MIT no topbar — abre o texto completo num modal
 $("btn-mit") && ($("btn-mit").onclick = async () => {
   const txt = await fetch("/license").then((r) => r.text()).catch(() => "MIT License — veja o arquivo LICENSE no repositório.");
@@ -1076,7 +1089,7 @@ function aiContext() {
 async function ingestFile(f) {
   if (!f) return;
   if (!/\.(csv|xlsx|xls|pdf)$/i.test(f.name)) return toast("Formato não suportado — use CSV, XLSX, XLS ou PDF.", true);
-  showOverlay("Lendo " + f.name, fmtBytes(f.size)); // feedback IMEDIATO — o parse pesado roda no worker
+  showOverlay("Lendo " + shortName(f.name), fmtBytes(f.size)); // feedback IMEDIATO — o parse pesado roda no worker
   try {
     let columns, rows, stats, sheetsInfo = null, sheetContext = "";
     if (/\.pdf$/i.test(f.name)) {
@@ -1092,8 +1105,8 @@ async function ingestFile(f) {
     try { setDocCtx(localStorage.getItem(ctxKey()) || "", { store: false }); } catch {} // recupera o contexto deste arquivo
     hideOverlay();
     showDocBanner();
-    $("prompt").placeholder = `Pergunte sobre "${f.name}"… ou envie em branco p/ um dashboard geral`;
-    let msg = `${f.name}: ${rows.length.toLocaleString("pt-BR")} linhas, ${columns.length} colunas`;
+    $("prompt").placeholder = `Pergunte sobre "${shortName(f.name, 34)}"… ou envie em branco p/ um dashboard geral`;
+    let msg = `${shortName(f.name)}: ${rows.length.toLocaleString("pt-BR")} linhas, ${columns.length} colunas`;
     if (sheetsInfo && sheetsInfo.stacked) msg += ` · ${sheetsInfo.used.length} abas empilhadas (${sheetsInfo.used.join(", ")})`;
     if (sheetsInfo && sheetsInfo.context) msg += " · abas auxiliares viraram contexto da IA";
     toast(msg);
@@ -1463,7 +1476,7 @@ async function postBuildDoc(body) {
 async function buildFromDoc(nl) {
   if (building || !docData) return;
   lastNl = nl; setBuilding(true);
-  showOverlay("Analisando seus dados", `${docData.name} · ${docData.rows.length.toLocaleString("pt-BR")} linhas`, true);
+  showOverlay("Analisando seus dados", `${shortName(docData.name)} · ${docData.rows.length.toLocaleString("pt-BR")} linhas`, true);
   try {
     const stats = docData.stats || docStatsText(docData.columns, docData.rows); // já vêm do worker; fallback p/ docs restaurados
     const r = await postBuildDoc({ columns: docData.columns, sample: docData.rows.slice(0, 15), stats, nl, context: aiContext() });

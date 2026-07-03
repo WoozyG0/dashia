@@ -73,6 +73,11 @@ let aiActive = 0;
 const AI_ROUTES = new Set(["/dashboard/build-doc", "/dashboard/edit-doc", "/dashboard/insight", "/dashboard/insights-batch", "/doc/extract-pdf"]);
 
 http.createServer(async (req, res) => {
+  // Anti DNS-rebinding: em modo local (sem HOST), só aceita requisições endereçadas ao
+  // próprio localhost — um site malicioso não consegue "renomear" o domínio dele p/ 127.0.0.1.
+  if (!process.env.HOST && !/^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/i.test(String(req.headers.host || ""))) {
+    res.writeHead(403); res.end("Forbidden"); return;
+  }
   const { pathname, searchParams } = new URL(req.url, "http://localhost");
   const method = req.method;
   // Sem CORS de propósito: a UI é servida por este mesmo servidor (same-origin).

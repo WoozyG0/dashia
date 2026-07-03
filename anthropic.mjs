@@ -52,6 +52,13 @@ export async function agentText(system, prompt, model = "sonnet", extra = {}) {
     }, AI_TIMEOUT_MS);
   });
   try { return await Promise.race([run, timeout]); }
+  catch (e) {
+    const msg = String(e?.message ?? e);
+    // sem chave e sem Claude Code logado → erro claro com o caminho da solução (em vez de stack críptica)
+    if (/api.?key|logg?ed|login|authenticat|credit|billing|exited with code|ENOENT|not found/i.test(msg))
+      throw new Error(`IA não configurada: ${msg}. Configure a ANTHROPIC_API_KEY no .env (copie o .env.example) ou instale e logue o Claude Code ("claude" no terminal).`);
+    throw e;
+  }
   finally { clearTimeout(timer); run.catch(() => {}); } // não deixa rejeição órfã derrubar o processo
 }
 

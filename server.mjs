@@ -192,7 +192,13 @@ http.createServer(async (req, res) => {
   }
 
   res.writeHead(404); res.end("Not found");
-}).listen(PORT, process.env.HOST ?? "127.0.0.1", () => console.log(`Dash.IA: http://localhost:${PORT}`));
+}).listen(PORT, process.env.HOST ?? "127.0.0.1", () => {
+  console.log(`Dash.IA: http://localhost:${PORT}`);
+  if (process.env.ANTHROPIC_API_KEY) console.log("IA: usando a ANTHROPIC_API_KEY do .env.");
+  else console.log(
+    "IA: sem ANTHROPIC_API_KEY no .env — vou usar a sessao local do Claude Code (se instalado e logado).\n" +
+    "    Para usar chave propria: copie .env.example para .env, preencha ANTHROPIC_API_KEY e reinicie.");
+});
 // 127.0.0.1 por padrão: dashboards salvos contêm dados reais da empresa — não expor na rede.
 // Para acesso externo consciente (deploy SaaS com auth), definir HOST=0.0.0.0.
 

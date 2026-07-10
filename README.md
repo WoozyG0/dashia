@@ -1,90 +1,95 @@
 # Dash.IA
 
-**Seus dados têm uma história. A IA conta ela para você.**
+**Your data has a story. AI tells it for you.**
 
-Anexe uma planilha (ou PDF) e peça em português. Um **orquestrador de IA** entende os dados,
-monta uma **equipe de agentes** — cada um analisa a sua fatia das colunas — e entrega um
-dashboard com **insights prontos** em cada painel. Tudo roda **na sua máquina**.
+*English · [Português (Brasil)](README.pt-BR.md)*
 
-## Como funciona
+Attach a spreadsheet (or PDF) and ask in plain language. An **AI orchestrator** understands your
+data, assembles a **team of agents** — each one analyzing its own slice of the columns — and
+delivers a dashboard with **ready-made insights** on every panel. Everything runs **on your machine**.
+
+> The app UI is currently in Brazilian Portuguese.
+
+## How it works
 
 ```
-arquivo → entendimento (orquestrador) → agentes em paralelo (um por ângulo)
-        → montagem → revisão do orquestrador (dedup + validade + pedido coberto)
-        → dashboard com insights prontos
+file → understanding (orchestrator) → agents in parallel (one per angle)
+     → assembly → orchestrator review (dedup + validity + request coverage)
+     → dashboard with ready-made insights
 ```
 
-- **Entende antes de montar** — domínio, granularidade e papel de cada coluna são inferidos
-  do conteúdo; o card "Como a IA entendeu seus dados" mostra o raciocínio e o mapeamento do
-  seu pedido (termo → coluna real).
-- **Pedido é contrato** — "percentual do faturamento por estado em 2024" vira share por UF
-  com o período aplicado em *todos* os painéis; o recorte fica escrito em cada um
-  ("34.518 de 100.000 linhas").
-- **Lê tudo** — Excel com **todas as abas** (mesmo esquema = empilhadas com coluna `ABA`;
-  abas de legenda viram contexto para a IA) e **PDF página a página** (texto extraído
-  localmente com pdf.js; a IA estrutura em colunas/linhas).
-- **Números pt-BR à prova de bala** — `1.234.567`, `R$ 1.234,56`, `(1.234,56)`, `1.234,56-`,
-  datas `dd/mm/aaaa`, encoding Windows-1252 de ERP.
-- **Insights já vêm prontos** — a lâmpada de cada painel acende no build, com números reais.
-- **Exportação de verdade** — PowerPoint de alta fidelidade (capa, resumo executivo com KPIs,
-  um slide por gráfico com o insight ao lado, tabela estilizada) e página HTML.
-- **Edição conversacional** — com o dashboard aberto, digite o ajuste ("transforma o gráfico
-  de estados em percentual") e a IA aplica sem refazer tudo.
+- **Understands before building** — domain, granularity and the role of every column are
+  inferred from the content; the "How the AI understood your data" card shows the reasoning
+  and how your request was mapped (term → actual column).
+- **Your request is a contract** — "revenue share by state in 2024" becomes a share-by-state
+  chart with the period filter applied to *every* panel; the applied filter is written on each
+  one ("34,518 of 100,000 rows").
+- **Reads everything** — Excel with **all sheets** (same schema = stacked with an `ABA` column;
+  legend/lookup sheets become AI context) and **PDFs page by page** (text extracted locally
+  with pdf.js; the AI structures it into columns/rows).
+- **Bulletproof pt-BR numbers** — `1.234.567`, `R$ 1.234,56`, `(1.234,56)`, `1.234,56-`,
+  `dd/mm/yyyy` dates, Windows-1252 ERP encodings.
+- **Insights come pre-generated** — each panel's lightbulb is lit at build time, with real numbers.
+- **Real exports** — high-fidelity PowerPoint deck (cover, executive summary with KPIs, one
+  slide per chart with its insight alongside, styled table) and a standalone HTML page.
+- **Conversational editing** — with a dashboard open, type the change ("turn the states chart
+  into percentages") and the AI applies it without rebuilding everything.
 
-## Requisitos
+## Requirements
 
 - **Node.js 20.6+**
-- IA — escolha **um** dos dois caminhos:
-  1. **Claude Code** instalado e logado (`claude` no terminal) — não precisa de chave; ou
-  2. **Chave da API Anthropic** ([console.anthropic.com](https://console.anthropic.com)) no `.env`.
+- AI — pick **one** of two paths:
+  1. **Claude Code** installed and logged in (`claude` in your terminal) — no API key needed; or
+  2. An **Anthropic API key** ([console.anthropic.com](https://console.anthropic.com)) in `.env`.
 
-## Instalação
+## Installation
 
 ```bash
 git clone https://github.com/WoozyG0/dashia.git
 cd dashia
 npm install
-cp .env.example .env    # edite se for usar chave de API
+cp .env.example .env    # edit it if you're using an API key
 npm start
 ```
 
-Abra **http://localhost:4000** — a landing page tem o botão "Abrir o app".
-Anexe um CSV/XLSX/PDF, descreva a análise (ou envie em branco para a visão geral) e pronto.
+Open **http://localhost:4000** — the landing page has an "Open the app" button.
+Attach a CSV/XLSX/PDF, describe the analysis (or send it empty for a general overview), done.
 
-## Configuração (`.env` — tudo opcional)
+## Configuration (`.env` — all optional)
 
-| Variável | Default | O que faz |
+| Variable | Default | What it does |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | *(vazia)* | Chave da API; vazia = usa a sessão do Claude Code |
-| `PORT` | `4000` | Porta do servidor |
-| `HOST` | `127.0.0.1` | `0.0.0.0` expõe na rede local (**sem autenticação — cuidado**) |
-| `DASH_ORCHESTRATE` | `1` | `0` = build em chamada única (mais rápido, menos profundo) |
-| `DASH_MODEL` | `sonnet` | Modelo padrão (`sonnet` \| `opus` \| `haiku`) |
-| `DASH_ORCH_MODEL` | `DASH_MODEL` | Modelo do orquestrador/revisor |
-| `DASH_AGENT_MODEL` | `DASH_MODEL` | Modelo dos agentes de fatia |
-| `DASH_AGENT_CONCURRENCY` | `3` | Agentes rodando em paralelo |
-| `DASH_AI_TIMEOUT` | `240` | Teto em segundos por chamada de IA |
-| `AI_CONCURRENCY` | `2` | Análises simultâneas aceitas pelo servidor |
+| `ANTHROPIC_API_KEY` | *(empty)* | API key; empty = use the local Claude Code session |
+| `PORT` | `4000` | Server port |
+| `HOST` | `127.0.0.1` | `0.0.0.0` exposes it on your LAN (**no authentication — be careful**) |
+| `DASH_ORCHESTRATE` | `1` | `0` = single-call build (faster, shallower) |
+| `DASH_MODEL` | `sonnet` | Default model (`sonnet` \| `opus` \| `haiku`) |
+| `DASH_ORCH_MODEL` | `DASH_MODEL` | Orchestrator/reviewer model |
+| `DASH_AGENT_MODEL` | `DASH_MODEL` | Slice-agent model |
+| `DASH_AGENT_CONCURRENCY` | `3` | Agents running in parallel |
+| `DASH_AI_TIMEOUT` | `240` | Per-AI-call timeout in seconds |
+| `AI_CONCURRENCY` | `2` | Concurrent analyses accepted by the server |
 
-## Privacidade e segurança
+## Privacy & security
 
-- O servidor escuta **só em localhost** por padrão; dados não saem da máquina.
-- A planilha é lida **no navegador**; ao servidor (e à IA) vão apenas nomes de colunas,
-  estatísticas agregadas e uma amostra mínima de linhas — nunca o arquivo inteiro.
-- Dashboards salvos ficam em `data/` (fora do git).
-- Sem CORS aberto, caminhos sanitizados, gate de concorrência e timeout em toda chamada de IA.
+- The server listens on **localhost only** by default; your data never leaves the machine.
+- Spreadsheets are parsed **in the browser**; the server (and the AI) only receive column
+  names, aggregate statistics and a minimal row sample — never the whole file.
+- Saved dashboards live in `data/` (outside git).
+- No open CORS, sanitized paths, DNS-rebinding guard, AI concurrency gate and a timeout on
+  every AI call.
 
-## Limitações conhecidas
+## Known limitations
 
-- PDF escaneado (imagem, sem camada de texto) não tem o que extrair.
-- Extração de PDF limitada a ~800 linhas por documento (o app avisa quando corta).
-- Uma fonte de dados por dashboard (um arquivo por vez).
+- Scanned PDFs (images, no text layer) have nothing to extract.
+- PDF extraction is capped at ~800 rows per document (the app tells you when it truncates).
+- One data source per dashboard (one file at a time).
 
 ## Stack
 
-Node HTTP puro (zero framework) · [Claude Agent SDK](https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk) ·
-ECharts · SheetJS · pdf.js · pptxgenjs — vendorizados, funciona offline (exceto a IA).
+Plain Node HTTP (zero frameworks) · [Claude Agent SDK](https://www.npmjs.com/package/@anthropic-ai/claude-agent-sdk) ·
+ECharts · SheetJS · pdf.js · pptxgenjs — all vendored; works offline (except the AI).
 
-## Licença
+## License
 
 [MIT](LICENSE)
